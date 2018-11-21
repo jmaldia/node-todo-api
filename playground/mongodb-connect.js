@@ -21,14 +21,15 @@ MongoClient.connect('mongodb://localhost:27017/ToDoApp', (err, client) => {
     //     console.log(JSON.stringify(result.ops, undefined, 2));
     // });
 
-    // db.collection('Users').insertOne({
-    //     name: 'Christina Maldia',
-    //     age: 39,
-    //     location: 'New York'
-    // }, (err, result) => {
-    //     if (err) {
-    //         return console.log('Unable to insert user', err);
-    //     }
+    db.collection('Users').insertOne({
+        name: 'Christina Maldia',
+        age: 39,
+        location: 'New York'
+    }, (err, result) => {
+        if (err) {
+            return console.log('Unable to insert user', err);
+        }
+    });
 
     //     console.log(JSON.stringify(result.ops, undefined, 2));
     //     console.log(result.ops[0]._id.getTimestamp());
