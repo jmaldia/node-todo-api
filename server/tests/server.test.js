@@ -4,19 +4,12 @@ const request = require('supertest');
 const { app } = require('./../server');
 const { Todo } = require('./../models/todo');
 
+// Seed data
 const todos = [
-    {
-        text: 'Buy food'
-    },
-    {
-        text: 'Deposit money'
-    },
-    {
-        text: 'Meet with Product team'
-    },
-    {
-        text: 'Meet with VC'
-    }
+    { text: 'Buy food' },
+    { text: 'Deposit money' },
+    { text: 'Meet with Product team' },
+    { text: 'Meet with VC' }
 ]
 
 // clear db before each test by passing a blank object
