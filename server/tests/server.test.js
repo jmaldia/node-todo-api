@@ -4,10 +4,30 @@ const request = require('supertest');
 const { app } = require('./../server');
 const { Todo } = require('./../models/todo');
 
+const todos = [
+    {
+        text: 'Buy food'
+    },
+    {
+        text: 'Deposit money'
+    },
+    {
+        text: 'Meet with Product team'
+    },
+    {
+        text: 'Meet with VC'
+    }
+]
+
 // clear db before each test by passing a blank object
+// Add seed data to make it predictable
 beforeEach((done) => {
-    Todo.remove({})
+    Todo.deleteMany() // deprected
+        .then(() => {
+            return Todo.insertMany(todos);
+        })
         .then(() => done());
+
 });
 
 describe('POST /todos', (done) => {
@@ -26,7 +46,7 @@ describe('POST /todos', (done) => {
                     return done(err);
                 } 
                 // checks if the todo was added
-                Todo.find()
+                Todo.find({text})
                     .then((todos) => {
                         expect(todos.length).toBe(1);
                         expect(todos[0].text).toBe(text);
@@ -50,10 +70,23 @@ describe('POST /todos', (done) => {
 
                 Todo.find()
                     .then((todos) => {
-                        expect(todos.length).toBe(0);
+                        expect(todos.length).toBe(4);
                         done();
                     })
                     .catch((e) => done(e));
             });
+    });
+
+    // GET /todos test
+    describe('GET /todos', () => {
+        it ('should get all todos', (done) => {
+            request(app)
+                .get('/todos')
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.todos.length).toBe(4);
+                })
+                .end(done);
+        });
     });
 }) ;
