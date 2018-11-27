@@ -8,7 +8,7 @@ const { Todo } = require('./../models/todo');
 // Seed data
 const todos = [
     { _id: new ObjectID(), text: 'Buy food' },
-    { _id: new ObjectID(), text: 'Deposit money' },
+    { _id: new ObjectID(), text: 'Deposit money', completed: true, completedAt: '333' },
     { _id: new ObjectID(), text: 'Meet with Product team' },
     { _id: new ObjectID(), text: 'Meet with VC' }
 ]
@@ -152,6 +152,47 @@ describe('POST /todos', (done) => {
             request(app)
                 .get('/todos/123')
                 .expect(404)
+                .end(done);
+        });
+    });
+
+    // PATCH /todos/:id tests
+    describe('PATCH /todos/:id', () => {
+        it('should update a todo item', (done) => {
+            let hexId = todos[0]._id.toHexString();
+            let text = 'This should be the new text';
+
+            request(app)
+                .patch(`/todos/${hexId}`)
+                .send({
+                    text, 
+                    completed: true
+                })
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.todo.completed).toBe(true);
+                    expect(res.body.todo.text).toBe(text);
+                    expect(typeof res.body.todo.completedAt).toBe('number');
+                })
+                .end(done);
+        });
+
+        it('should clear completedAt when to do is not completed', (done) => {
+            let hexId = todos[1]._id.toHexString();
+            let text = 'This should be the new text';
+
+            request(app)
+                .patch(`/todos/${hexId}`)
+                .send({
+                    text, 
+                    completed: false
+                })
+                .expect(200)
+                .expect((res) => {
+                    expect(res.body.todo.completed).toBe(false);
+                    expect(res.body.todo.text).toBe(text);
+                    expect(res.body.todo.completedAt).toBeFalsy();
+                })
                 .end(done);
         });
     });
