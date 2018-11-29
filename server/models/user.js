@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
-// mongoose user model
-let User = mongoose.model('User', {
+let UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -17,7 +18,7 @@ let User = mongoose.model('User', {
     password: {
         type: String,
         require: true,
-        minLength: 8
+        minlength: 8
     },
     tokens: [{
         access: {
@@ -30,5 +31,32 @@ let User = mongoose.model('User', {
         }
     }]
 });
+
+UserSchema.methods.toJSON = function () {
+    let user = this;
+    let userObject = user.toObject();
+
+    return _.pick(userObject, ['_id', 'email']);
+};
+
+// needs to use this keyword. Would use non-arrow function
+UserSchema.methods.generateAuthToken = function () {
+    let user = this;
+    let access = 'auth';
+    let token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
+
+    user.tokens = user.tokens.concat([{ access, token }]);
+
+    return user.save()
+        .then(() => {
+            return token;
+        })
+        .then((token) => {
+            return token;
+        });
+};
+
+// mongoose user model
+let User = mongoose.model('User', UserSchema);
 
 module.exports = { User };
