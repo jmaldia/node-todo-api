@@ -148,7 +148,7 @@ app.post('/users', (req, res) => {
 // };
 
 // PRIVATE ROUTE
-app.get('users/me', (req, res) => {
+app.get('/users/me', (req, res) => {
     let token = req.header('x-auth');
 
     User.findByToken(token)
