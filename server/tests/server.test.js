@@ -4,6 +4,7 @@ const { ObjectID } = require('mongodb');
 
 const { app } = require('./../server');
 const { Todo } = require('./../models/todo');
+const { User } = require('./../models/user');
 const { todos, populateTodos, users, populateUsers } = require('./seed/seed');
 
 // clear db before each test by passing a blank object
@@ -210,7 +211,29 @@ describe('POST /todos', (done) => {
 
     describe('POST /users', () => {
         it('should create a user', (done) => {
-            
+            let email = 'jon@maldia.net';
+            let password = '111111aaaaaa!';
+
+            request(app)
+                .post('/users')
+                .send({ email, password })
+                .expect(200)
+                .expect((res) => {
+                    expect(res.headers['x-auth']).toBeTruthy();
+                    expect(res.body._id).toBeTruthy();
+                    expect(res.body.email).toBe(email);
+                })
+                .end((err) => {
+                    if (err) {
+                        return done(err);
+                    }
+
+                    User.findOne({email}).then((user) => {
+                        expect(user).toBeTruthy();
+                        expect(user.password).not.toBe(password);
+                        done();
+                    })
+                });
         });
 
         it('should return validation errors if request invalid', (done) => {
